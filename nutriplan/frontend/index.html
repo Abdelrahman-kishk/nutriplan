@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>NutriPlan | Food, Nutrition &amp; Fitness Planner</title>
+
+<script src="https://cdn.tailwindcss.com"></script>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" />
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.4/dist/chart.umd.min.js"></script>
+
+<link rel="stylesheet" href="css/style.css" />
+
+<script>
+  tailwind.config = {
+    theme: {
+      extend: {
+        fontFamily: { sans: ['Inter', 'sans-serif'] },
+        colors: {
+          brand: {
+            emerald: '#10b981',
+            teal: '#0d9488',
+          },
+        },
+        boxShadow: {
+          soft: '0 4px 24px -4px rgba(16,185,129,0.15)',
+        },
+      },
+    },
+  };
+</script>
+</head>
+<body class="bg-gray-50 text-gray-900 font-sans antialiased">
+
+<!-- ==================== FULLSCREEN LOADER ==================== -->
+<div id="app-loader" class="fixed inset-0 z-[100] bg-gradient-to-br from-emerald-500 to-teal-600 flex flex-col items-center justify-center gap-5">
+  <div class="relative">
+    <i class="fa-solid fa-leaf text-white text-6xl leaf-pulse"></i>
+  </div>
+  <p class="text-white font-semibold text-lg tracking-wide">Preparing your NutriPlan…</p>
+  <div class="flex gap-2">
+    <span class="w-2.5 h-2.5 rounded-full bg-white bounce-dot" style="animation-delay:0s"></span>
+    <span class="w-2.5 h-2.5 rounded-full bg-white bounce-dot" style="animation-delay:0.15s"></span>
+    <span class="w-2.5 h-2.5 rounded-full bg-white bounce-dot" style="animation-delay:0.3s"></span>
+  </div>
+</div>
+
+<!-- ==================== APP SHELL ==================== -->
+<div id="app-shell" class="hidden min-h-screen">
+
+  <!-- Mobile backdrop -->
+  <div id="sidebar-backdrop" class="fixed inset-0 bg-black/40 z-30 hidden lg:hidden"></div>
+
+  <!-- ============ SIDEBAR ============ -->
+  <aside id="sidebar" class="fixed top-0 left-0 h-full w-72 bg-white border-r border-gray-100 z-40 flex flex-col -translate-x-full lg:translate-x-0 transition-transform duration-300">
+    <div class="flex items-center gap-3 px-6 py-6 border-b border-gray-100">
+      <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-emerald-500 to-teal-600 flex items-center justify-center shadow-soft shrink-0">
+        <i class="fa-solid fa-leaf text-white"></i>
+      </div>
+      <div>
+        <h1 class="font-extrabold leading-tight">NutriPlan</h1>
+        <p class="text-[11px] text-gray-400 -mt-0.5">Nutrition &amp; Fitness Planner</p>
+      </div>
+      <button id="sidebar-close" class="ml-auto lg:hidden text-gray-400 hover:text-gray-600">
+        <i class="fa-solid fa-xmark text-lg"></i>
+      </button>
+    </div>
+
+    <nav class="flex-1 px-4 py-6 space-y-1">
+      <button data-view="recipes" class="nav-item active w-full flex items-center gap-3 px-3.5 py-2.5 rounded-lg text-sm font-medium transition">
+        <i class="fa-solid fa-bowl-food w-5 text-center"></i> Meals &amp; Recipes
+      </button>
+      <button data-view="scanner" class="nav-item w-full flex items-center gap-3 px-3.5 py-2.5 rounded-lg text-sm font-medium transition">
+        <i class="fa-solid fa-barcode w-5 text-center"></i> Product Scanner
+      </button>
+      <button data-view="foodlog" class="nav-item w-full flex items-center gap-3 px-3.5 py-2.5 rounded-lg text-sm font-medium transition">
+        <i class="fa-solid fa-clipboard-list w-5 text-center"></i> Food Log
+      </button>
+    </nav>
+
+    <div class="px-4 pb-4">
+      <div class="rounded-xl bg-gradient-to-br from-emerald-50 to-teal-50 border border-emerald-100 p-3 text-xs text-gray-600 mb-3">
+        <i class="fa-solid fa-circle-info text-emerald-500 mr-1"></i>
+        Daily target adjustable in your profile.
+      </div>
+    </div>
+
+    <div class="relative px-4 pb-6 border-t border-gray-100 pt-4">
+      <button id="profile-pill" class="w-full flex items-center gap-3 px-2 py-2 rounded-xl hover:bg-gray-50 transition">
+        <img id="profile-avatar" src="" alt="avatar" class="w-9 h-9 rounded-full object-cover bg-gray-200" />
+        <div class="text-left flex-1 min-w-0">
+          <p id="profile-name" class="text-sm font-semibold truncate">—</p>
+          <p id="profile-plan" class="text-[11px] text-emerald-600 font-medium">—</p>
+        </div>
+        <i class="fa-solid fa-chevron-up text-xs text-gray-400"></i>
+      </button>
+      <div id="profile-dropdown" class="hidden absolute bottom-[68px] left-4 right-4 bg-white border border-gray-100 rounded-xl shadow-lg overflow-hidden text-sm">
+        <button id="edit-targets-btn" class="w-full text-left px-4 py-2.5 hover:bg-gray-50 flex items-center gap-2"><i class="fa-solid fa-bullseye text-gray-400 w-4"></i> Edit Targets</button>
+      </div>
+    </div>
+  </aside>
+
+  <!-- ============ MAIN ============ -->
+  <div class="lg:pl-72 flex flex-col min-h-screen">
+
+    <!-- Header -->
+    <header class="sticky top-0 z-20 bg-white/90 backdrop-blur border-b border-gray-100 px-4 sm:px-8 py-4 flex items-center gap-4">
+      <button id="sidebar-open" class="lg:hidden text-gray-500 hover:text-gray-800">
+        <i class="fa-solid fa-bars text-xl"></i>
+      </button>
+      <div class="min-w-0">
+        <h2 id="page-title" class="text-lg sm:text-xl font-bold truncate">Meals &amp; Recipes</h2>
+        <p id="page-subtitle" class="text-xs text-gray-400 hidden sm:block">Discover recipes tailored to your goals</p>
+      </div>
+      <div class="ml-auto flex items-center gap-3">
+        <button id="header-refresh" class="w-9 h-9 rounded-full hover:bg-gray-100 flex items-center justify-center text-gray-500" title="Refresh">
+          <i class="fa-solid fa-arrows-rotate"></i>
+        </button>
+      </div>
+    </header>
+
+    <main class="flex-1 px-4 sm:px-8 py-6">
+
+      <!-- ============ RECIPES VIEW ============ -->
+      <section id="view-recipes">
+
+        <!-- Search & filters -->
+        <div class="mb-6 space-y-4">
+          <div class="relative max-w-xl">
+            <i class="fa-solid fa-magnifying-glass absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 text-sm"></i>
+            <input id="search-input" type="text" placeholder="Search recipes or ingredients…" class="w-full pl-11 pr-4 py-3 rounded-xl border border-gray-200 bg-white text-sm focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 outline-none shadow-sm" />
+          </div>
+          <div id="diet-pills" class="flex gap-2 overflow-x-auto pb-1 no-scrollbar"></div>
+        </div>
+
+        <!-- Categories -->
+        <div class="mb-8">
+          <h3 class="text-sm font-bold text-gray-700 mb-3">Browse by Meal Type</h3>
+          <div id="category-grid" class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3"></div>
+        </div>
+
+        <!-- Listing controls -->
+        <div class="flex items-center justify-between mb-4">
+          <p id="results-count" class="text-sm text-gray-500">Loading recipes…</p>
+          <div class="flex items-center gap-2">
+            <select id="sort-select" class="text-xs border border-gray-200 rounded-lg px-2.5 py-1.5 bg-white focus:outline-none">
+              <option value="newest">Newest</option>
+              <option value="calories-asc">Calories: Low to High</option>
+              <option value="calories-desc">Calories: High to Low</option>
+              <option value="time-asc">Prep Time</option>
+              <option value="title-asc">Title A–Z</option>
+            </select>
+            <div class="flex bg-gray-100 rounded-lg p-1">
+              <button id="view-grid-btn" class="layout-btn active px-2.5 py-1.5 rounded-md text-xs"><i class="fa-solid fa-grip"></i></button>
+              <button id="view-list-btn" class="layout-btn px-2.5 py-1.5 rounded-md text-xs"><i class="fa-solid fa-list"></i></button>
+            </div>
+          </div>
+        </div>
+
+        <div id="recipe-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5"></div>
+        <div id="recipe-empty" class="hidden flex-col items-center justify-center py-20 text-center">
+          <i class="fa-solid fa-utensils text-4xl text-gray-300 mb-3"></i>
+          <p class="font-semibold text-gray-600">No recipes found</p>
+          <p class="text-sm text-gray-400">Try adjusting your search or filters</p>
+        </div>
+
+        <div id="pagination" class="flex items-center justify-center gap-2 mt-8"></div>
+      </section>
+
+      <!-- ============ SCANNER VIEW ============ -->
+      <section id="view-scanner" class="hidden">
+        <div class="max-w-lg mx-auto bg-white rounded-2xl border border-gray-100 shadow-sm p-8 text-center">
+          <div class="w-16 h-16 mx-auto rounded-2xl bg-gradient-to-br from-emerald-500 to-teal-600 flex items-center justify-center mb-4">
+            <i class="fa-solid fa-barcode text-white text-2xl"></i>
+          </div>
+          <h3 class="font-bold text-lg mb-1">Product Scanner</h3>
+          <p class="text-sm text-gray-500 mb-5">Search a packaged food by name to preview its estimated macros, then log it to today's plan.</p>
+          <div class="flex gap-2">
+            <input id="scanner-input" type="text" placeholder="e.g. Protein bar, oat milk…" class="flex-1 rounded-lg border border-gray-200 px-3.5 py-2.5 text-sm focus:ring-2 focus:ring-emerald-500 outline-none" />
+            <button id="scanner-search-btn" class="px-4 py-2.5 rounded-lg bg-gradient-to-r from-emerald-500 to-teal-600 text-white text-sm font-semibold">Search</button>
+          </div>
+          <div id="scanner-result" class="mt-6 hidden text-left bg-gray-50 rounded-xl p-4 border border-gray-100"></div>
+        </div>
+      </section>
+
+      <!-- ============ FOOD LOG VIEW ============ -->
+      <section id="view-foodlog" class="hidden">
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+          <div class="lg:col-span-2 space-y-4" id="foodlog-slots"></div>
+          <div class="space-y-4">
+            <div class="bg-white rounded-2xl border border-gray-100 shadow-sm p-5">
+              <h3 class="font-bold text-sm mb-4">Today's Totals</h3>
+              <div class="flex items-center justify-center">
+                <canvas id="totals-chart" width="220" height="220"></canvas>
+              </div>
+              <div id="totals-legend" class="mt-4 space-y-2 text-sm"></div>
+            </div>
+            <div class="bg-white rounded-2xl border border-gray-100 shadow-sm p-5">
+              <h3 class="font-bold text-sm mb-3">Calories</h3>
+              <div class="flex items-baseline gap-2">
+                <span id="calories-consumed" class="text-2xl font-extrabold text-emerald-600">0</span>
+                <span class="text-sm text-gray-400">/ <span id="calories-target">0</span> kcal</span>
+              </div>
+              <div class="w-full h-2 bg-gray-100 rounded-full mt-3 overflow-hidden">
+                <div id="calories-bar" class="h-full bg-gradient-to-r from-emerald-500 to-teal-600 rounded-full transition-all" style="width:0%"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+    </main>
+  </div>
+</div>
+
+<!-- Recipe details modal template (rendered via SweetAlert2) -->
+<template id="macro-donut-template"><canvas id="macro-donut" width="180" height="180"></canvas></template>
+
+<script src="js/api.js"></script>
+<script src="js/state.js"></script>
+<script src="js/ui.js"></script>
+<script src="js/app.js"></script>
+</body>
+</html>

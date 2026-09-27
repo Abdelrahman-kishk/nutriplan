@@ -1,0 +1,109 @@
+/* ---------- Loader animations ---------- */
+.leaf-pulse {
+  animation: leafPulse 1.4s ease-in-out infinite;
+}
+@keyframes leafPulse {
+  0%, 100% { transform: scale(1); opacity: 1; }
+  50% { transform: scale(1.15); opacity: 0.75; }
+}
+.bounce-dot {
+  animation: bounceDot 1s ease-in-out infinite;
+}
+@keyframes bounceDot {
+  0%, 100% { transform: translateY(0); opacity: 0.6; }
+  50% { transform: translateY(-6px); opacity: 1; }
+}
+
+/* ---------- Nav items ---------- */
+.nav-item {
+  color: #4b5563;
+}
+.nav-item:hover {
+  background-color: #f0fdfa;
+  color: #0d9488;
+}
+.nav-item.active {
+  background: linear-gradient(135deg, #10b981, #0d9488);
+  color: #fff;
+  box-shadow: 0 4px 14px -4px rgba(16, 185, 129, 0.4);
+}
+
+/* ---------- Filter pills ---------- */
+.diet-pill {
+  white-space: nowrap;
+  padding: 0.5rem 1rem;
+  border-radius: 9999px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  border: 1px solid #e5e7eb;
+  background: #fff;
+  color: #4b5563;
+  transition: all 0.15s ease;
+  cursor: pointer;
+}
+.diet-pill:hover { border-color: #10b981; color: #0d9488; }
+.diet-pill.active {
+  background: linear-gradient(135deg, #10b981, #0d9488);
+  border-color: transparent;
+  color: #fff;
+}
+
+/* ---------- Layout toggle buttons ---------- */
+.layout-btn { color: #9ca3af; }
+.layout-btn.active { background: #fff; color: #0d9488; box-shadow: 0 1px 3px rgba(0,0,0,0.08); }
+
+/* ---------- Scrollbar hide for pill row ---------- */
+.no-scrollbar::-webkit-scrollbar { display: none; }
+.no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+
+/* ---------- Skeleton shimmer ---------- */
+.skeleton {
+  position: relative;
+  overflow: hidden;
+  background: #e5e7eb;
+}
+.skeleton::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  transform: translateX(-100%);
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.6), transparent);
+  animation: shimmer 1.4s infinite;
+}
+@keyframes shimmer {
+  100% { transform: translateX(100%); }
+}
+
+/* ---------- Recipe card ---------- */
+.recipe-card {
+  background: #fff;
+  border: 1px solid #f1f5f9;
+  border-radius: 1rem;
+  overflow: hidden;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+.recipe-card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 12px 30px -10px rgba(16,185,129,0.25);
+}
+.macro-badge {
+  font-size: 10px;
+  font-weight: 700;
+  padding: 2px 8px;
+  border-radius: 9999px;
+}
+
+/* ---------- List view row ---------- */
+.recipe-row {
+  background: #fff;
+  border: 1px solid #f1f5f9;
+  border-radius: 1rem;
+  transition: box-shadow 0.2s ease;
+}
+.recipe-row:hover { box-shadow: 0 8px 24px -10px rgba(16,185,129,0.25); }
+
+/* ---------- Bookmark button ---------- */
+.bookmark-btn.active i { font-weight: 900; color: #ef4444; }
+
+/* ---------- Toast custom class hook (SweetAlert2) ---------- */
+.swal2-popup.np-popup { border-radius: 1rem; }
